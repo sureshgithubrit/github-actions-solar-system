@@ -15,9 +15,12 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '/')));
 app.use(cors())
 
-mongoose.connect('mangodb+srv://supercluster.d83jj.magodb.net/superData', {
-    user: 'superuser',
-    pass: 'SuperPassword',
+// mongoose.connect('mangodb+srv://supercluster.d83jj.magodb.net/superData', {
+//     user: 'superuser',
+//     pass: 'SuperPassword',
+mongoose.connect(process.env.MONGO_URI, {
+    user: process.env.MONGO_USERNAME,
+    pass: process.env.MONGO_PASSWORD,
     useNewUrlParser: true,
     useUnifiedTopology: true
 }, function(err) {
