@@ -171,4 +171,22 @@ jobs:
           tags: |
             ${{vars.DOCKER_USER}}/solar-system:${{github.sha}}
             ghcr.io/${{ github.repository_owner }}/solar-system:${{github.sha}}
+          
+    Dev-Deploy:
+      needs: docker-login
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout Repo
+          uses: actions/checkou@v4
+
+        - name: Install kubectls CLI
+          uses: azure/setup-kubectl@v4
+          with:
+            version: 'v1.26.0' # default is latest stable
+
+        - name: Fetch Kubernets Cluster Details
+          run: |
+            kubectl version --short
+            echo -------------------------
+            kubectl get nodes
 
