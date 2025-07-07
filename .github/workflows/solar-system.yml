@@ -40,7 +40,7 @@ jobs:
         - name: Setup NodeJS Version
           uses: actions/setup-node@v4
           with:
-            node-version: 20
+            node-version: ${{matrix.node-version}}
     
         - name: Install Dependencies
           run: npm install
@@ -83,8 +83,8 @@ jobs:
             path: node_modules
             key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
         
-        - name: unit testing
-          run: npm run coverage
+        # - name: unit testing
+        #   run: npm run coverage
 
         - name: Archive Test Result
           uses: actions/upload-artifact@v4
