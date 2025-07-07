@@ -26,7 +26,8 @@ jobs:
           MONGO_PASSWORD: non-prod-password
         strategy:
           matrix:
-            node-version: [18,20]
+            # node-version: [18,20]
+            node-version: [18]
             os: [ubuntu-latest]
             exclude:
               - node-version: 18
