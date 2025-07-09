@@ -182,7 +182,13 @@ jobs:
         - name: Install kubectls CLI
           uses: azure/setup-kubectl@v4
           with:
-            version: 'v1.26.0' # default is latest stable
+            version: 'v1.32.6' # default is latest stable
+        
+        - name: Set Kubeconfig File
+          uses: azure/k8s-set-context@v4
+          with:
+            method: kubeconfig
+            kubeconfig: ${{secrets.KUBECONFIG}}
 
         - name: Fetch Kubernets Cluster Details
           run: |
