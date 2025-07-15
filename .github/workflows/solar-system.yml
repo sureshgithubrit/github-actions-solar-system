@@ -192,13 +192,14 @@ jobs:
 
         - name: Fetch Kubernets Cluster Details
           run: |
-            kubectl version
+            #kubectl version
             echo -------------------------
             # kubectl get nodes
         
         - name: Save Nginx Ingress Controller IP as a GITHUB Environment Variable
           run: |
-            echo "INGRESS_IP=$(kubectl -n ingress-nginx get services ingress-nginx-controller -o jsonpath="{.status.loadBalancer.ingress{0}.ip}")" >> $GITHUB_ENV 
+            #echo "INGRESS_IP=$(kubectl -n ingress-nginx get services ingress-nginx-controller -o jsonpath="{.status.loadBalancer.ingress{0}.ip}")" >> $GITHUB_ENV
+            echo "INGRESS_IP=32001" >> $GITHUB_ENV
         #By using $GITHUB_ENV we can save INGRESS_IP as a environemnt variable and can use these values form any of the jobs.
         
         - name: Replace Token in Manifest file
