@@ -193,8 +193,10 @@ jobs:
         - name: Fetch Kubernets Cluster Details
           run: |
             #kubectl version
-            echo -------------------------
+            echo "========================"
+            echo "kubectl command eecuted successfully"
             # kubectl get nodes
+
         
         - name: Save Nginx Ingress Controller IP as a GITHUB Environment Variable
           run: |
@@ -217,3 +219,19 @@ jobs:
         - name: check the manifest files
           run: |
             cat kubernetes/development/*.yaml
+        
+        - name: Create MongoDB Secret
+          run: |
+            # kubectl -n ${{vars.NAMESPACE}} create secret generic mongo-db-creds \
+            # --from-literal=MONGO_URI=${{env.MONGO_URI}} \
+            # --from-literal=MONGO_USERNAME=${{vars.MONGO_USERNAME}} \
+            # --from-literal=MONGO_PASSWORD=${{secrets.MONGO_PASSWORD}} \
+            # --save-config \
+            # --dry-run=client \
+            # -o yaml |kubectl apply -f -
+            echo "========================"
+            echo "kubectl command eecuted successfully and DB creds were Saved"
+        
+        - name: Deploy to Dev Environemnt
+          run: |
+            kubectl apply -f kubernetes/development
