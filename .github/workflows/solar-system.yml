@@ -194,5 +194,25 @@ jobs:
           run: |
             kubectl version
             echo -------------------------
-            kubectl get nodes
-
+            # kubectl get nodes
+        
+        - name: Save Nginx Ingress Controller IP as a GITHUB Environment Variable
+          run: |
+            echo "INGRESS_IP=$(kubectl -n ingress-nginx get services ingress-nginx-controller -o jsonpath="{.status.loadBalancer.ingress{0}.ip}")" >> $GITHUB_ENV 
+        #By using $GITHUB_ENV we can save INGRESS_IP as a environemnt variable and can use these values form any of the jobs.
+        
+        - name: Replace Token in Manifest file
+          uses: cschleiden/replace-tokens@v1
+          with:
+            tokenPrefix: '_{_'
+            tokenSuffix: '_}_'
+            files: '["kubernetes/development/*.yaml"]'
+          env:
+            NAMESPACE: ${{vars.NAMESPACE}}
+            REPLICAS: ${{vars.REPLICAS}}
+            IMAGE: ${{vars.DOCKER_USER}}/solar-system:${{github.sha}}
+            INGRESS_IP:  ${{env.INGRESS_IP}}
+        
+        - name: check the manifest files
+          run: |
+            cat kubernetes/development/*.yaml
