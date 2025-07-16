@@ -246,7 +246,7 @@ jobs:
           run: |
             echo "APP_INGRESS_HOST=$(kubectl -n ${{vars.NAMESPACE}} get ingress -o jsonpath="{.items[0].spec.tls[0].hosts[0]}")" >> "$GITHUB_OUTPUT"
     
-    Integration-Testing:
+    dev-Integration-Testing:
       name: Dev Integration testing
       needs: Dev-Deploy
       runs-on: ubuntu-latest
@@ -254,6 +254,94 @@ jobs:
         - name: Test URL output using curl and JQ
           env:
             URL: ${{needs.Dev-Deploy.outputs.APP_INGRESS_URL}}
+          run: |
+            echo $URL
+            echo "=========================="
+            curl https://$URL/live -s -k | jq -r .status|grep -i live
+
+    #####################################PRODUCTION###########################
+    prod-Deploy:
+      needs: dev-Integration-Testing
+      environment: 
+        name: production
+        url: https://${{steps.set-ingress-host-address.outputs.APP_INGRESS_HOST}}
+      outputs:
+        APP_INGRESS_URL: ${{steps.set-ingress-host-address.outputs.APP_INGRESS_HOST}} #there is a job for set-ingress-host-address get public IP. Because this IP will be in dynamic.
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout Repo
+          uses: actions/checkout@v4
+
+        - name: Install kubectls CLI
+          uses: azure/setup-kubectl@v4
+          with:
+            version: 'v1.32.6' # default is latest stable
+        
+        - name: Set Kubeconfig File
+          uses: azure/k8s-set-context@v4
+          with:
+            method: kubeconfig
+            kubeconfig: ${{secrets.KUBECONFIG}}
+
+        - name: Fetch Kubernets Cluster Details
+          run: |
+            #kubectl version
+            echo "========================"
+            echo "kubectl command eecuted successfully"
+            # kubectl get nodes
+
+        
+        - name: Save Nginx Ingress Controller IP as a GITHUB Environment Variable
+          run: |
+            #echo "INGRESS_IP=$(kubectl -n ingress-nginx get services ingress-nginx-controller -o jsonpath="{.status.loadBalancer.ingress{0}.ip}")" >> $GITHUB_ENV
+            echo "INGRESS_IP=32001" >> $GITHUB_ENV
+        #By using $GITHUB_ENV we can save INGRESS_IP as a environemnt variable and can use these values form any of the jobs.
+        
+        - name: Replace Token in Manifest file
+          uses: cschleiden/replace-tokens@v1
+          with:
+            tokenPrefix: '_{_'
+            tokenSuffix: '_}_'
+            files: '["kubernetes/production/*.yaml"]'
+          env:
+            NAMESPACE: ${{vars.NAMESPACE}}
+            REPLICAS: ${{vars.REPLICAS}}
+            IMAGE: ${{vars.DOCKER_USER}}/solar-system:${{github.sha}}
+            INGRESS_IP:  ${{env.INGRESS_IP}}
+        
+        - name: check the manifest files
+          run: |
+            cat kubernetes/production/*.yaml
+        
+        - name: Create MongoDB Secret
+          run: |
+            # kubectl -n ${{vars.NAMESPACE}} create secret generic mongo-db-creds \
+            # --from-literal=MONGO_URI=${{env.MONGO_URI}} \
+            # --from-literal=MONGO_USERNAME=${{vars.MONGO_USERNAME}} \
+            # --from-literal=MONGO_PASSWORD=${{secrets.MONGO_PASSWORD}} \
+            # --save-config \
+            # --dry-run=client \
+            # -o yaml |kubectl apply -f -
+            echo "========================"
+            echo "kubectl command eecuted successfully and DB creds were Saved"
+        
+        - name: Deploy to Dev Environemnt
+          run: |
+            kubectl apply -f kubernetes/production
+        
+        - name: Set App ingress Host URL
+          id: set-ingress-host-address
+          run: |
+            echo "APP_INGRESS_HOST=$(kubectl -n ${{vars.NAMESPACE}} get ingress -o jsonpath="{.items[0].spec.tls[0].hosts[0]}")" >> "$GITHUB_OUTPUT"
+    
+    prod-Integration-Testing:
+      name: Prod Integration testing
+      needs: prod-Deploy
+      runs-on: ubuntu-latest
+      steps:
+        - name: Test URL output using curl and JQ
+          env:
+            URL: ${{needs.prod-Deploy.outputs.APP_INGRESS_URL}}
           run: |
             echo $URL
             echo "=========================="
