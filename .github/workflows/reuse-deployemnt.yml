@@ -2,7 +2,12 @@ name: Deployment Reusable Steps
 
 on:
   workflow_call:
-
+    secrets:
+      k8s-config:
+        required: true
+      mongodb-password:
+        required: true
+    
 jobs:
   reuse-deploy:
     # It's good practice to define the environment at the job level
@@ -26,7 +31,7 @@ jobs:
         uses: azure/k8s-set-context@v4
         with:
           method: kubeconfig
-          kubeconfig: ${{ secrets.KUBECONFIG }}
+          kubeconfig: ${{ secrets.k8s-config }}
 
       - name: Fetch Kubernetes Cluster Details
         run: |
@@ -65,7 +70,7 @@ jobs:
           # kubectl -n ${{ vars.NAMESPACE }} create secret generic mongo-db-creds \
           # --from-literal=MONGO_URI=${{ env.MONGO_URI }} \
           # --from-literal=MONGO_USERNAME=${{ vars.MONGO_USERNAME }} \
-          # --from-literal=MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }} \
+          # --from-literal=MONGO_PASSWORD=${{ secrets.mongodb-password }} \
           # --save-config \
           # --dry-run=client \
           # -o yaml | kubectl apply -f -

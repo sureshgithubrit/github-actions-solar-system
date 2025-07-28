@@ -176,6 +176,9 @@ jobs:
       if: contains(github.ref, 'feature/')
       needs: docker-login
       uses: ./.github/workflows/reuse-deployemnt.yml
+      secrets: 
+        k8s-config: ${{ secrets.KUBECONFIG }}
+        mongodb-password: ${{ secrets.MONGO_PASSWORD }}
     
     dev-Integration-Testing:
       if: contains(github.ref, 'feature/')
