@@ -175,7 +175,7 @@ jobs:
     Dev-Deploy:
       if: contains(github.ref, 'feature/')
       needs: docker-login
-      uses: ./.github/workflows/reuse-deployemnt.yml
+      uses: ./.github/workflows/reuse-deployment.yml
       secrets: 
         k8s-config: ${{ secrets.KUBECONFIG }}
         mongodb-password: ${{ secrets.MONGO_PASSWORD }}
@@ -198,7 +198,7 @@ jobs:
     prod-Deploy:
       if: github.ref == 'refs/heads/main'
       needs: docker-login
-      uses: ./.github/workflows/reuse-deployemnt.yml
+      uses: ./.github/workflows/reuse-deployment.yml
     
     prod-Integration-Testing:
       if: github.ref == 'refs/heads/main'
