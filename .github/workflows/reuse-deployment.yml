@@ -24,7 +24,10 @@ on:
         default: dev
         required: true
         type: string
-
+    
+    outputs:
+      Application-url:
+        value: ${{jobs.reuse-deploy.outputs.APP_INGRESS_URL}}
     secrets:
       k8s-config:
         required: true
