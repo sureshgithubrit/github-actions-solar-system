@@ -43,15 +43,10 @@ jobs:
           with:
             node-version: ${{matrix.node-version}}
     
-        - name: Install Dependencies
-          run: npm install
-        
-        - name: Get npm cache directory
-          uses: actions/cache@v4
-          # id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+        - name: composite-action - install & caching NPm Pckages
+          uses: ./.github/custom-actions/npm-action
           with:
-            path: node_modules
-            key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
+            path-of-folder: node-modules
           
         - name: Unit Testing
           run: npm test
@@ -88,15 +83,10 @@ jobs:
         #   with:
         #     node-version: 18
             
-        - name: install dependencies
-          run: npm install --save-dev mongodb-memory-server
-        
-        - name: Get npm cache directory
-          uses: actions/cache@v4
-          # id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+        - name: composite-action - install & caching NPm Pckages
+          uses: ./.github/custom-actions/npm-action
           with:
-            path: node_modules
-            key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
+            path-of-folder: node-modules
         
         - name: Run the Code Coverage
           run: npm run coverage
