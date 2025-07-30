@@ -18,3 +18,8 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }} #by default it is having read access
           giphy-api-key: ${{ secrets.GIPHY_API_KEY }}
+      - name: Post javascript action PR Comment
+        uses: sureshgithubrit/js-action-pr-ghipy-comment@1.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }} #by default it is having read access
+          giphy-api-key: ${{ secrets.GIPHY_API_KEY }}
